@@ -1,7 +1,10 @@
 # xamarin-android-ffmpeg
 Xamarin Android FFMpeg binding
 
-Usage
+# Big Thanks
+https://github.com/WritingMinds/ffmpeg-android-java
+
+# Usage
 
         public class VideoConverter 
         {
