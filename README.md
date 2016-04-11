@@ -11,7 +11,10 @@ Usage
 
             }
 
-            public File convertFile(File inputFile, Action<string> logger = null, Action<int,int> onProgress = null)
+            public File convertFile(
+                File inputFile, 
+                Action<string> logger = null, 
+                Action<int,int> onProgress = null)
             {
                 File ouputFile = new File(inputFile.CanonicalPath + ".mpg");
 
@@ -69,25 +72,27 @@ Usage
                 int total = 0;
                 int current = 0;
 
-                Com.Github.Hiteshsondhi88.Libffmpeg.FFmpeg.GetInstance(AuditionApplication.Current).ExecuteAndWait(cmdParams,
-                    new VideoConverterListener {
-                        OnFailure = (f) => {
-                            logger?.Invoke(f);
-                        },
-                        OnProgress = (s) => {
-                            logger?.Invoke(s);
-                            int n = Extract(s, "Duration:", ",");
-                            if (n != -1) {
-                                total = n;
+                Com.Github.Hiteshsondhi88.Libffmpeg.FFmpeg
+                        .GetInstance(AuditionApplication.Current)
+                        .ExecuteAndWait(cmdParams,
+                            new VideoConverterListener {
+                                OnFailure = (f) => {
+                                    logger?.Invoke(f);
+                                },
+                                OnProgress = (s) => {
+                                    logger?.Invoke(s);
+                                    int n = Extract(s, "Duration:", ",");
+                                    if (n != -1) {
+                                        total = n;
+                                    }
+                                    n = Extract(s, "time=", " bitrate=");
+                                    if (n != -1) {
+                                        current = n;
+                                        onProgress?.Invoke(current, total);
+                                    }
+                                }
+                            
                             }
-                            n = Extract(s, "time=", " bitrate=");
-                            if (n != -1) {
-                                current = n;
-                                onProgress?.Invoke(current, total);
-                            }
-                        }
-                    
-                    }
                 );
 
                 return ouputFile;
