@@ -4,6 +4,10 @@ Xamarin Android FFMpeg binding
 # Big Thanks
 https://github.com/WritingMinds/ffmpeg-android-java
 
+# Licensing
+This code is licensed under MIT, however, you must use this library by accepting and following licensing terms mentioned in the source project at https://github.com/WritingMinds/ffmpeg-android-java
+
+
 # Usage
 
         public class VideoConverter 
