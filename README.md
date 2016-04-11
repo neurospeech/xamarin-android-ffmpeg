@@ -7,6 +7,10 @@ https://github.com/WritingMinds/ffmpeg-android-java
 # Licensing
 This code is licensed under MIT, however, you must use this library by accepting and following licensing terms mentioned in the source project at https://github.com/WritingMinds/ffmpeg-android-java
 
+# Nuget Package
+You can download Xamarin.Android.FFmpeg package from Nuget Package manager or run following command in Nuget Package Console.
+
+        Install-Package Xamarin.Android.FFmpeg
 
 # Usage
 
