@@ -84,7 +84,7 @@ You can download Xamarin.Android.FFmpeg package from Nuget Package manager or ru
                 int current = 0;
 
                 Com.Github.Hiteshsondhi88.Libffmpeg.FFmpeg
-                        .GetInstance(AuditionApplication.Current)
+                        .GetInstance(Xamarin.Forms.Forms.Context)
                         .ExecuteAndWait(cmdParams,
                             new VideoConverterListener {
                                 OnFailure = (f) => {
