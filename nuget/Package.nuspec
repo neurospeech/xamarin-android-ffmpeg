@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Xamarin.Android.FFmpeg</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>FFmpeg binding for Xamarin Android</title>
     <authors>akash.kava</authors>
     <owners></owners>
@@ -26,8 +26,8 @@
     <tags>xamarin,ffmpeg,android</tags>
   </metadata>
   <files>
-    <file src="..\src\bin\debug\*.dll" target="lib" />
-    <file src="..\src\bin\debug\*.pdb" target="lib" />
-    <file src="..\src\bin\debug\*.mdb" target="lib" />
+    <file src="..\FFMpeg.Xamarin\bin\debug\*.dll" target="lib" />
+    <file src="..\FFMpeg.Xamarin\bin\debug\*.pdb" target="lib" />
+    <file src="..\FFMpeg.Xamarin\bin\debug\*.mdb" target="lib" />
   </files>
 </package>
