@@ -35,6 +35,7 @@ namespace FFMpeg.Xamarin
                 if(ffmpegFile.CanExecute())
                     ffmpegFile.SetExecutable(false);
                 ffmpegFile.Delete();
+                System.Diagnostics.Debug.WriteLine($"ffmpeg file deleted at {ffmpegFile.AbsolutePath}");
             }
 
             using (var s = context.Assets.Open("ffmpeg", Android.Content.Res.Access.Streaming)) {
@@ -43,21 +44,35 @@ namespace FFMpeg.Xamarin
                 }
             }
 
+            System.Diagnostics.Debug.WriteLine($"ffmpeg file copied at {ffmpegFile.AbsolutePath}");
+
             if (!ffmpegFile.CanExecute()) {
                 ffmpegFile.SetExecutable(true);
+                System.Diagnostics.Debug.WriteLine($"ffmpeg file made executable");
             }
+
+            _initialized = true;
         }
 
         public static Task Run(
             Context context, 
-            string[] cmd, 
+            string cmd, 
             Action<string> logger = null) {
 
-            return Task.Run( async () =>
+            TaskCompletionSource<int> task = new TaskCompletionSource<int>();
+
+            Task.Run( async () =>
             {
                 Instance.Init(context);
 
-                var process = Java.Lang.Runtime.GetRuntime().Exec(cmd);
+                bool success = false;
+
+
+                System.Diagnostics.Debug.WriteLine($"ffmpeg initialized");
+
+                var process = Java.Lang.Runtime.GetRuntime().Exec( Instance.ffmpegFile.CanonicalPath + " " + cmd );
+
+                System.Diagnostics.Debug.WriteLine($"ffmpeg started");
 
                 var startTime = DateTime.UtcNow;
 
@@ -70,14 +85,17 @@ namespace FFMpeg.Xamarin
 
                     if ((now - startTime).TotalSeconds > 60) {
                         throw new TimeoutException();
-                        startTime = now;
                     }
+
+                    startTime = now;
+
 
                     try
                     {
-                        process.ExitValue();
+                        success = process.ExitValue() == 0;
 
                         // seems process is completed...
+                        System.Diagnostics.Debug.WriteLine($"ffmpeg finished");
                         break;
                     }
                     catch (Java.Lang.IllegalThreadStateException e)
@@ -95,9 +113,24 @@ namespace FFMpeg.Xamarin
                     }
 
                 } while (true);
-                
 
+                using (var br = new Java.IO.BufferedReader(
+                    new Java.IO.InputStreamReader(
+                        success ? process.InputStream : process.ErrorStream)))
+                {
+                    string line = null;
+                    while ((line = br.ReadLine()) != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine(line);
+                        logger?.Invoke(line);
+                    }
+                }
+
+
+                task.SetResult(0);
             });
+
+            return task.Task;
 
         }
 
