@@ -22,7 +22,7 @@ You can download Xamarin.Android.FFmpeg package from Nuget Package manager or ru
 
             }
 
-            public File convertFile(
+            public File ConvertFile(Context contex,
                 File inputFile, 
                 Action<string> logger = null, 
                 Action<int,int> onProgress = null)
@@ -83,28 +83,21 @@ You can download Xamarin.Android.FFmpeg package from Nuget Package manager or ru
                 int total = 0;
                 int current = 0;
 
-                Com.Github.Hiteshsondhi88.Libffmpeg.FFmpeg
-                        .GetInstance(Xamarin.Forms.Forms.Context)
-                        .ExecuteAndWait(cmdParams,
-                            new VideoConverterListener {
-                                OnFailure = (f) => {
-                                    logger?.Invoke(f);
-                                },
-                                OnProgress = (s) => {
-                                    logger?.Invoke(s);
-                                    int n = Extract(s, "Duration:", ",");
-                                    if (n != -1) {
-                                        total = n;
-                                    }
-                                    n = Extract(s, "time=", " bitrate=");
-                                    if (n != -1) {
-                                        current = n;
-                                        onProgress?.Invoke(current, total);
-                                    }
-                                }
-                            
-                            }
-                );
+				await FFMpeg.Xamarin.FFMpegLibrary.Run(
+					context,
+					 cmdParams 
+					, (s) => {
+						logger?.Invoke(s);
+						int n = Extract(s, "Duration:", ",");
+						if (n != -1) {
+							total = n;
+						}
+						n = Extract(s, "time=", " bitrate=");
+						if (n != -1) {
+							current = n;
+							onProgress?.Invoke(current, total);
+						}
+					});
 
                 return ouputFile;
             }
@@ -138,41 +131,3 @@ You can download Xamarin.Android.FFmpeg package from Nuget Package manager or ru
 
         }
 
-        public class VideoConverterListener :
-            Java.Lang.Object,
-            Com.Github.Hiteshsondhi88.Libffmpeg.IFFmpegExecuteResponseHandler
-        {
-            public Action<string> OnFailure { get; set; }
-
-            void IFFmpegExecuteResponseHandler.OnFailure(string p0)
-            {
-                OnFailure?.Invoke(p0);
-            }
-
-            public Action OnFinish { get; set; }
-
-            void IResponseHandler.OnFinish()
-            {
-                OnFinish?.Invoke();
-            }
-
-            public Action<string> OnProgress { get; set; }
-            void IFFmpegExecuteResponseHandler.OnProgress(string p0)
-            {
-                OnProgress?.Invoke(p0);
-            }
-
-            public Action OnStart { get; set; }
-
-            void IResponseHandler.OnStart()
-            {
-                OnStart?.Invoke();
-            }
-
-            public Action<string> OnSuccess { get; set; }
-
-            void IFFmpegExecuteResponseHandler.OnSuccess(string p0)
-            {
-                OnSuccess?.Invoke(p0);
-            }
-        }

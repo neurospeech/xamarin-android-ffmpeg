@@ -22,7 +22,8 @@ namespace FFMpeg.Xamarin
 
         private Java.IO.File ffmpegFile;
 
-        public void Init(Context context) {
+        public void Init(Context context)
+        {
             if (_initialized)
                 return;
 
@@ -31,22 +32,26 @@ namespace FFMpeg.Xamarin
 
             ffmpegFile = new Java.IO.File(filesDir + "/ffmpeg");
 
-            if (ffmpegFile.Exists()) {
-                if(ffmpegFile.CanExecute())
+            if (ffmpegFile.Exists())
+            {
+                if (ffmpegFile.CanExecute())
                     ffmpegFile.SetExecutable(false);
                 ffmpegFile.Delete();
                 System.Diagnostics.Debug.WriteLine($"ffmpeg file deleted at {ffmpegFile.AbsolutePath}");
             }
 
-            using (var s = context.Assets.Open("ffmpeg", Android.Content.Res.Access.Streaming)) {
-                using (var fout = System.IO.File.OpenWrite(ffmpegFile.AbsolutePath)) {
+            using (var s = context.Assets.Open("ffmpeg", Android.Content.Res.Access.Streaming))
+            {
+                using (var fout = System.IO.File.OpenWrite(ffmpegFile.AbsolutePath))
+                {
                     s.CopyTo(fout);
                 }
             }
 
             System.Diagnostics.Debug.WriteLine($"ffmpeg file copied at {ffmpegFile.AbsolutePath}");
 
-            if (!ffmpegFile.CanExecute()) {
+            if (!ffmpegFile.CanExecute())
+            {
                 ffmpegFile.SetExecutable(true);
                 System.Diagnostics.Debug.WriteLine($"ffmpeg file made executable");
             }
@@ -54,83 +59,75 @@ namespace FFMpeg.Xamarin
             _initialized = true;
         }
 
-        public static Task Run(
-            Context context, 
-            string cmd, 
-            Action<string> logger = null) {
+        public static async Task<int> Run(Context context, string cmd, Action<string> logger = null) {
+
+            TaskCompletionSource<int> source = new TaskCompletionSource<int>();
+
+            await Task.Run(() => {
+                try {
+                    int n = _Run(context, cmd, logger);
+                    source.SetResult(n);
+                } catch (Exception ex) {
+                    source.SetException(ex);
+                }
+            });
+
+            return await source.Task;
+        }
+
+        private static int _Run(
+            Context context,
+            string cmd,
+            Action<string> logger = null)
+        {
 
             TaskCompletionSource<int> task = new TaskCompletionSource<int>();
 
-            Task.Run( async () =>
+            Instance.Init(context);
+
+
+            System.Diagnostics.Debug.WriteLine($"ffmpeg initialized");
+
+            //var process = Java.Lang.Runtime.GetRuntime().Exec( Instance.ffmpegFile.CanonicalPath + " " + cmd );
+
+            var startInfo = new System.Diagnostics.ProcessStartInfo(Instance.ffmpegFile.CanonicalPath, cmd);
+
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.UseShellExecute = false;
+            var process = new System.Diagnostics.Process();
+
+            process.StartInfo = startInfo;
+
+
+            bool finished = false;
+
+            string error = null;
+
+            process.Start();
+
+
+            Task.Run(() =>
             {
-                Instance.Init(context);
-
-                bool success = false;
-
-
-                System.Diagnostics.Debug.WriteLine($"ffmpeg initialized");
-
-                var process = Java.Lang.Runtime.GetRuntime().Exec( Instance.ffmpegFile.CanonicalPath + " " + cmd );
-
-                System.Diagnostics.Debug.WriteLine($"ffmpeg started");
-
-                var startTime = DateTime.UtcNow;
-
-                do
+                using (var reader = process.StandardError)
                 {
-
-                    await Task.Delay(100);
-
-                    var now = DateTime.UtcNow;
-
-                    if ((now - startTime).TotalSeconds > 60) {
-                        throw new TimeoutException();
-                    }
-
-                    startTime = now;
-
-
-                    try
+                    string processOutput = "";
+                    do
                     {
-                        success = process.ExitValue() == 0;
-
-                        // seems process is completed...
-                        System.Diagnostics.Debug.WriteLine($"ffmpeg finished");
-                        break;
-                    }
-                    catch (Java.Lang.IllegalThreadStateException e)
-                    {
-                        // do nothing...
-                    }
-
-                    using (var br = new Java.IO.BufferedReader(new Java.IO.InputStreamReader(process.ErrorStream)))
-                    {
-                        string line = null;
-                        while ((line = br.ReadLine()) != null) {
-                            System.Diagnostics.Debug.WriteLine(line);
-                            logger?.Invoke(line);
-                        }
-                    }
-
-                } while (true);
-
-                using (var br = new Java.IO.BufferedReader(
-                    new Java.IO.InputStreamReader(
-                        success ? process.InputStream : process.ErrorStream)))
-                {
-                    string line = null;
-                    while ((line = br.ReadLine()) != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine(line);
+                        var line = reader.ReadLine();
+                        if (line == null)
+                            break;
                         logger?.Invoke(line);
-                    }
+                        processOutput += line;
+                    } while (!finished);
+                    error = processOutput;
                 }
-
-
-                task.SetResult(0);
             });
 
-            return task.Task;
+            process.WaitForExit();
+
+            return process.ExitCode;
+
 
         }
 
