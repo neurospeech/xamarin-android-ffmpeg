@@ -16,7 +16,7 @@ namespace FFMpeg.Xamarin
     public class FFMpegLibrary
     {
 
-        public string CDNHost { get; set; } = "cdn.rawgit.com";
+        public string CDNHost { get; set; } = "raw.githubusercontent.com";
 
 
         public static FFMpegLibrary Instance = new FFMpegLibrary();
@@ -70,21 +70,44 @@ namespace FFMpeg.Xamarin
             }
 
             // lets try to download
+            var dlg = new ProgressDialog(context);
+            dlg.SetTitle(downloadMessage ?? "Downloading Video Converter");
+            //dlg.SetMessage(downloadMessage ?? "Downloading Video Converter");
+            dlg.Indeterminate = false;
+            dlg.SetProgressStyle(ProgressDialogStyle.Horizontal);
+            dlg.Show();
+
 
             using (var c = new System.Net.Http.HttpClient())
             {
                 using (var fout = System.IO.File.OpenWrite(ffmpegFile.AbsolutePath))
                 {
-                    var s = await c.GetStreamAsync(source.Url);
 
-                    var dlg = ProgressDialog.Show(
-                        context, 
-                        downloadTitle ?? "Downloading", 
-                        downloadMessage ?? "Downloading Video Converter");
+                    string url = source.Url;
+                    var g = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, url);
+                    
+                    var h = await c.SendAsync(g, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
 
-                    var buffer = new byte[5120];
 
-                    long total = s.Length;
+
+
+
+                    
+
+                    var buffer = new byte[10240];
+
+
+                    var s = await h.Content.ReadAsStreamAsync();
+                    long total = h.Content.Headers.ContentLength.GetValueOrDefault();
+
+                    IEnumerable<string> sl;
+                    if (h.Headers.TryGetValues("Content-Length", out sl))
+                    {
+                        if (total == 0 && sl.Any()) {
+                            long.TryParse(sl.FirstOrDefault(), out total);
+                        }
+                    }
+
 
                     int count = 0;
 
@@ -92,14 +115,16 @@ namespace FFMpeg.Xamarin
 
                     dlg.Max = (int)total;
 
+
                     while ((count = await s.ReadAsync(buffer, 0, buffer.Length)) > 0) {
 
                         await fout.WriteAsync(buffer, 0, count);
 
                         progress += count;
 
-                        dlg.Progress = progress;
+                        //System.Diagnostics.Debug.WriteLine($"Downloaded {progress} of {total} from {url}");
 
+                        dlg.Progress = progress;
                     }
 
                     dlg.Hide();
@@ -247,7 +272,10 @@ namespace FFMpeg.Xamarin
 
         public string Hash { get; }
 
-        public string Url => $"https://{FFMpegLibrary.Instance.CDNHost}/neurospeech/xamarin-android-ffmpeg/binary/{FFMPEGVersion}/{Arch}/ffmpeg";
+
+        //https://cdn.rawgit.com/neurospeech/xamarin-android-ffmpeg/master/binary/3.0.1/arm/ffmpeg
+        //https://raw.githubusercontent.com/neurospeech/xamarin-android-ffmpeg/master/binary/3.0.1/arm/ffmpeg
+        public string Url => $"https://{FFMpegLibrary.Instance.CDNHost}/neurospeech/xamarin-android-ffmpeg/master/binary/{FFMPEGVersion}/{Arch}/ffmpeg";
 
         public Func<string, bool> IsArch { get;  }
 
