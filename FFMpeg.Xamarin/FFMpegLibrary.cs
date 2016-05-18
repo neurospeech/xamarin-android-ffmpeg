@@ -50,24 +50,28 @@ namespace FFMpeg.Xamarin
 
             FFMPEGSource source = FFMPEGSource.Get();
 
-            if (ffmpegFile.Exists())
+            await Task.Run(() =>
             {
 
-                if (source.IsHashMatch(System.IO.File.ReadAllBytes(ffmpegFile.CanonicalPath)))
+                if (ffmpegFile.Exists())
                 {
-                    _initialized = true;
-                    return;
+
+                    if (source.IsHashMatch(System.IO.File.ReadAllBytes(ffmpegFile.CanonicalPath)))
+                    {
+                        _initialized = true;
+                        return;
+                    }
+
+                    // file is not same...
+
+                    // delete the file...
+
+                    if (ffmpegFile.CanExecute())
+                        ffmpegFile.SetExecutable(false);
+                    ffmpegFile.Delete();
+                    System.Diagnostics.Debug.WriteLine($"ffmpeg file deleted at {ffmpegFile.AbsolutePath}");
                 }
-
-                // file is not same...
-                
-                // delete the file...
-
-                if (ffmpegFile.CanExecute())
-                    ffmpegFile.SetExecutable(false);
-                ffmpegFile.Delete();
-                System.Diagnostics.Debug.WriteLine($"ffmpeg file deleted at {ffmpegFile.AbsolutePath}");
-            }
+            });
 
             // lets try to download
             var dlg = new ProgressDialog(context);
@@ -155,24 +159,38 @@ namespace FFMpeg.Xamarin
         /// <returns></returns>
         public static async Task<int> Run(Context context, string cmd, Action<string> logger = null) {
 
-            TaskCompletionSource<int> source = new TaskCompletionSource<int>();
-
-            
-            
-            await Instance.Init(context);
-
-            await Task.Run(() => {
-                try {
+            try
+            {
+                TaskCompletionSource<int> source = new TaskCompletionSource<int>();
 
 
-                    int n = _Run(context, cmd, logger);
-                    source.SetResult(n);
-                } catch (Exception ex) {
-                    source.SetException(ex);
-                }
-            });
 
-            return await source.Task;
+                await Instance.Init(context);
+
+                await Task.Run(() =>
+                {
+                    try
+                    {
+
+
+                        int n = _Run(context, cmd, logger);
+                        source.SetResult(n);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine(ex);
+                        source.SetException(ex);
+                    }
+                });
+
+                return await source.Task;
+            }
+            catch (Exception ex) {
+
+                System.Diagnostics.Debug.WriteLine(ex);
+
+                throw ex;
+            }
         }
 
         private static int _Run(
