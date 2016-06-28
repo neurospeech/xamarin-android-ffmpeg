@@ -55,11 +55,18 @@ namespace FFMpeg.Xamarin
 
                 if (ffmpegFile.Exists())
                 {
-
-                    if (source.IsHashMatch(System.IO.File.ReadAllBytes(ffmpegFile.CanonicalPath)))
+                    try
                     {
-                        _initialized = true;
-                        return;
+                        if (source.IsHashMatch(System.IO.File.ReadAllBytes(ffmpegFile.CanonicalPath)))
+                        {
+                            if (!ffmpegFile.CanExecute())
+                                ffmpegFile.SetExecutable(true);
+                            _initialized = true;
+                            return;
+                        }
+                    }
+                    catch(Exception ex) {
+                        System.Diagnostics.Debug.WriteLine($" Error validating file {ex}");
                     }
 
                     // file is not same...
@@ -72,6 +79,12 @@ namespace FFMpeg.Xamarin
                     System.Diagnostics.Debug.WriteLine($"ffmpeg file deleted at {ffmpegFile.AbsolutePath}");
                 }
             });
+
+            if (ffmpegFile.Exists())
+            {
+                // ffmpeg file exists...
+                return;
+            }
 
             // lets try to download
             var dlg = new ProgressDialog(context);
