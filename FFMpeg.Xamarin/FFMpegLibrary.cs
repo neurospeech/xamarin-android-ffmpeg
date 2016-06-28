@@ -99,7 +99,7 @@ namespace FFMpeg.Xamarin
 
                     
 
-                    var buffer = new byte[10240];
+                    var buffer = new byte[51200];
 
 
                     var s = await h.Content.ReadAsStreamAsync();
