@@ -80,10 +80,14 @@ namespace FFMpeg.Xamarin
                 }
             });
 
-            if (ffmpegFile.Exists())
+            if (_initialized)
             {
                 // ffmpeg file exists...
                 return;
+            }
+
+            if (ffmpegFile.Exists()) {
+                ffmpegFile.Delete();
             }
 
             // lets try to download
