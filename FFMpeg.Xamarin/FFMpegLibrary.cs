@@ -300,7 +300,7 @@ namespace FFMpeg.Xamarin
         public static string FFMPEGVersion { get;  } = "3.0.1";
 
         public static FFMPEGSource[] Sources = new FFMPEGSource[] {
-            new FFMPEGSource("arm", x=> x.Contains("arm"), "4nzzxDKxIYlvyK8tFH7/iNMHTdU="),
+            new FFMPEGSource("arm", x=> !x.EndsWith("86"), "4nzzxDKxIYlvyK8tFH7/iNMHTdU="),
             new FFMPEGSource("x86", x=> x.EndsWith("86"), "DdTbrTBf8Zeh6p5hWL0ggdIp5w4=")
         };
 
