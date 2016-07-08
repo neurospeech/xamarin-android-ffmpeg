@@ -96,7 +96,12 @@ namespace FFMpeg.Xamarin
             //dlg.SetMessage(downloadMessage ?? "Downloading Video Converter");
             dlg.Indeterminate = false;
             dlg.SetProgressStyle(ProgressDialogStyle.Horizontal);
-            dlg.CancelEvent += (s, e) => { };
+            dlg.SetCancelable(false);
+            dlg.CancelEvent += (s, e) => {
+                
+            };
+
+            dlg.SetCanceledOnTouchOutside(false);
             dlg.Show();
 
 
