@@ -22,7 +22,10 @@ You can download Xamarin.Android.FFmpeg package from Nuget Package manager or ru
 
             }
 
-            public File ConvertFile(Context contex,
+		/**
+		* This method must be called from UI thread.
+		***/
+            public Task<File> ConvertFileAsync(Context context,
                 File inputFile, 
                 Action<string> logger = null, 
                 Action<int,int> onProgress = null)
@@ -83,21 +86,21 @@ You can download Xamarin.Android.FFmpeg package from Nuget Package manager or ru
                 int total = 0;
                 int current = 0;
 
-				await FFMpeg.Xamarin.FFMpegLibrary.Run(
-					context,
-					 cmdParams 
-					, (s) => {
-						logger?.Invoke(s);
-						int n = Extract(s, "Duration:", ",");
-						if (n != -1) {
-							total = n;
-						}
-						n = Extract(s, "time=", " bitrate=");
-						if (n != -1) {
-							current = n;
-							onProgress?.Invoke(current, total);
-						}
-					});
+		await FFMpeg.Xamarin.FFMpegLibrary.Run(
+			context,
+			cmdParams 
+			, (s) => {
+				logger?.Invoke(s);
+				int n = Extract(s, "Duration:", ",");
+				if (n != -1) {
+					total = n;
+				}
+				n = Extract(s, "time=", " bitrate=");
+				if (n != -1) {
+					current = n;
+					onProgress?.Invoke(current, total);
+				}
+			});
 
                 return ouputFile;
             }
