@@ -248,8 +248,10 @@ namespace FFMpeg.Xamarin
 
             process.Start();
 
+            
 
-            Task.Run(async () =>
+
+            Task.Run(() =>
             {
                 try
                 {
@@ -267,13 +269,12 @@ namespace FFMpeg.Xamarin
 
                             if (line.StartsWith(EndOfFFMPEGLine))
                             {
-                                // we are assuming that process has finished.. we will exit forcefully
-                                // after 1 minute...
-                                await Task.Delay(TimeSpan.FromMinutes(1));
 
-                                System.Diagnostics.Debug.WriteLine("Forcing ffmpeg to exit..");
+                                Task.Run(async () => {
+                                    await Task.Delay(TimeSpan.FromMinutes(1));
+                                    finished = true;
+                                });
 
-                                process.Kill();
                             }
 
                         } while (!finished);
@@ -287,7 +288,13 @@ namespace FFMpeg.Xamarin
                 }
             });
 
-            process.WaitForExit();
+            while (!finished)
+            {
+                process.WaitForExit(10000);
+                if (process.HasExited) {
+                    break;
+                }
+            }
 
             return process.ExitCode;
 
