@@ -216,6 +216,8 @@ namespace FFMpeg.Xamarin
             }
         }
 
+        public static string EndOfFFMPEGLine = "final ratefactor:";
+
         private static int _Run(
             Context context,
             string cmd,
@@ -247,20 +249,41 @@ namespace FFMpeg.Xamarin
             process.Start();
 
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                using (var reader = process.StandardError)
+                try
                 {
-                    string processOutput = "";
-                    do
+                    using (var reader = process.StandardError)
                     {
-                        var line = reader.ReadLine();
-                        if (line == null)
-                            break;
-                        logger?.Invoke(line);
-                        processOutput += line;
-                    } while (!finished);
-                    error = processOutput;
+                        string processOutput = "";
+                        do
+                        {
+                            var line = reader.ReadLine();
+                            if (line == null)
+                                break;
+                            logger?.Invoke(line);
+                            processOutput += line;
+
+
+                            if (line.StartsWith(EndOfFFMPEGLine))
+                            {
+                                // we are assuming that process has finished.. we will exit forcefully
+                                // after 1 minute...
+                                await Task.Delay(TimeSpan.FromMinutes(1));
+
+                                System.Diagnostics.Debug.WriteLine("Forcing ffmpeg to exit..");
+
+                                process.Kill();
+                            }
+
+                        } while (!finished);
+                        error = processOutput;
+
+
+                    }
+                }
+                catch (Exception ex) {
+                    System.Diagnostics.Debug.WriteLine(ex);
                 }
             });
 
