@@ -15,13 +15,15 @@ namespace FFMpeg.Xamarin
 {
     public class FFMpegLibrary
     {
+        public static string EndOfFFMPEGLine = "final ratefactor:";
+
         public string CDNHost { get; set; } = "raw.githubusercontent.com";
         
-        public static FFMpegLibrary Instance = new FFMpegLibrary();
+        public readonly static FFMpegLibrary Instance = new FFMpegLibrary();
 
         private bool _initialized = false;
 
-        private Java.IO.File ffmpegFile;
+        private Java.IO.File _ffmpegFile;
 
         /// <summary>
         /// 
@@ -41,21 +43,20 @@ namespace FFMpeg.Xamarin
             // do all initialization...
             var filesDir = context.FilesDir;
 
-            ffmpegFile = new Java.IO.File(filesDir + "/ffmpeg");
+            _ffmpegFile = new Java.IO.File(filesDir + "/ffmpeg");
 
             FFMpegSource source = FFMpegSource.Get();
 
             await Task.Run(() =>
             {
-
-                if (ffmpegFile.Exists())
+                if (_ffmpegFile.Exists())
                 {
                     try
                     {
-                        if (source.IsHashMatch(System.IO.File.ReadAllBytes(ffmpegFile.CanonicalPath)))
+                        if (source.IsHashMatch(System.IO.File.ReadAllBytes(_ffmpegFile.CanonicalPath)))
                         {
-                            if (!ffmpegFile.CanExecute())
-                                ffmpegFile.SetExecutable(true);
+                            if (!_ffmpegFile.CanExecute())
+                                _ffmpegFile.SetExecutable(true);
                             _initialized = true;
                             return;
                         }
@@ -69,10 +70,10 @@ namespace FFMpeg.Xamarin
 
                     // delete the file...
 
-                    if (ffmpegFile.CanExecute())
-                        ffmpegFile.SetExecutable(false);
-                    ffmpegFile.Delete();
-                    System.Diagnostics.Debug.WriteLine($"ffmpeg file deleted at {ffmpegFile.AbsolutePath}");
+                    if (_ffmpegFile.CanExecute())
+                        _ffmpegFile.SetExecutable(false);
+                    _ffmpegFile.Delete();
+                    System.Diagnostics.Debug.WriteLine($"ffmpeg file deleted at {_ffmpegFile.AbsolutePath}");
                 }
             });
 
@@ -82,29 +83,28 @@ namespace FFMpeg.Xamarin
                 return;
             }
 
-            if (ffmpegFile.Exists())
+            if (_ffmpegFile.Exists())
             {
-                ffmpegFile.Delete();
+                _ffmpegFile.Delete();
             }
 
             // lets try to download
-            var dlg = new ProgressDialog(context);
-            dlg.SetTitle(downloadMessage ?? "Downloading Video Converter");
+            var dialog = new ProgressDialog(context);
+            dialog.SetTitle(downloadMessage ?? "Downloading Video Converter");
             //dlg.SetMessage(downloadMessage ?? "Downloading Video Converter");
-            dlg.Indeterminate = false;
-            dlg.SetProgressStyle(ProgressDialogStyle.Horizontal);
-            dlg.SetCancelable(false);
-            dlg.CancelEvent += (s, e) =>
+            dialog.Indeterminate = false;
+            dialog.SetProgressStyle(ProgressDialogStyle.Horizontal);
+            dialog.SetCancelable(false);
+            dialog.CancelEvent += (s, e) =>
             {
 
             };
 
-            dlg.SetCanceledOnTouchOutside(false);
-            dlg.Show();
-
+            dialog.SetCanceledOnTouchOutside(false);
+            dialog.Show();
             using (var c = new System.Net.Http.HttpClient())
             {
-                using (var fout = System.IO.File.OpenWrite(ffmpegFile.AbsolutePath))
+                using (var fout = System.IO.File.OpenWrite(_ffmpegFile.AbsolutePath))
                 {
                     string url = source.Url;
                     var g = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, url);
@@ -128,29 +128,27 @@ namespace FFMpeg.Xamarin
                     int count = 0;
                     int progress = 0;
 
-                    dlg.Max = (int)total;
+                    dialog.Max = (int)total;
 
                     while ((count = await s.ReadAsync(buffer, 0, buffer.Length)) > 0)
                     {
-
                         await fout.WriteAsync(buffer, 0, count);
 
                         progress += count;
 
                         //System.Diagnostics.Debug.WriteLine($"Downloaded {progress} of {total} from {url}");
 
-                        dlg.Progress = progress;
+                        dialog.Progress = progress;
                     }
-
-                    dlg.Hide();
+                    dialog.Hide();
                 }
             }
 
-            System.Diagnostics.Debug.WriteLine($"ffmpeg file copied at {ffmpegFile.AbsolutePath}");
+            System.Diagnostics.Debug.WriteLine($"ffmpeg file copied at {_ffmpegFile.AbsolutePath}");
 
-            if (!ffmpegFile.CanExecute())
+            if (!_ffmpegFile.CanExecute())
             {
-                ffmpegFile.SetExecutable(true);
+                _ffmpegFile.SetExecutable(true);
                 System.Diagnostics.Debug.WriteLine($"ffmpeg file made executable");
             }
 
@@ -195,9 +193,7 @@ namespace FFMpeg.Xamarin
                 throw ex;
             }
         }
-
-        public static string EndOfFFMPEGLine = "final ratefactor:";
-
+        
         private static int _Run(Context context, string cmd, Action<string> logger = null)
         {
             TaskCompletionSource<int> task = new TaskCompletionSource<int>();
@@ -206,7 +202,7 @@ namespace FFMpeg.Xamarin
 
             //var process = Java.Lang.Runtime.GetRuntime().Exec( Instance.ffmpegFile.CanonicalPath + " " + cmd );
 
-            var startInfo = new System.Diagnostics.ProcessStartInfo(Instance.ffmpegFile.CanonicalPath, cmd);
+            var startInfo = new System.Diagnostics.ProcessStartInfo(Instance._ffmpegFile.CanonicalPath, cmd);
 
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardOutput = true;
@@ -221,39 +217,32 @@ namespace FFMpeg.Xamarin
             string error = null;
 
             process.Start();
-
-
+            
             Task.Run(() =>
             {
                 try
                 {
                     using (var reader = process.StandardError)
                     {
-                        string processOutput = "";
-                        do
+                        StringBuilder processOutput = new StringBuilder();
+                        while (!finished)
                         {
                             var line = reader.ReadLine();
                             if (line == null)
                                 break;
                             logger?.Invoke(line);
-                            processOutput += line;
-
-
+                            processOutput.Append(line);
+                            
                             if (line.StartsWith(EndOfFFMPEGLine))
                             {
-
                                 Task.Run(async () =>
                                 {
                                     await Task.Delay(TimeSpan.FromMinutes(1));
                                     finished = true;
                                 });
-
                             }
-
-                        } while (!finished);
-                        error = processOutput;
-
-
+                        }
+                        error = processOutput.ToString();
                     }
                 }
                 catch (Exception ex)
