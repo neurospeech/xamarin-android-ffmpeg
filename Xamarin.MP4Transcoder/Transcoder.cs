@@ -86,22 +86,36 @@ namespace Xamarin.MP4Transcoder
         /// <param name="presets"></param>
         /// <param name="progress"></param>
         /// <returns></returns>
-        public Task ConvertAsync(Java.IO.File inputFile, Java.IO.File outputFile, Action<double> progress = null) {
-            TaskCompletionSource<object> taskSource = new TaskCompletionSource<object>(); 
-            
-            MediaTranscoder.Instance.TranscodeVideo(inputFile.AbsolutePath, outputFile.AbsolutePath, strategy, new TranscoderListener {
-                TranscodeProgress = progress,
-                TranscodeFailed =  e => {
-                    taskSource.TrySetException(e);
-                },
-                TranscodeCanceled = () => {
-                    taskSource.TrySetCanceled();
-                },
-                TranscodeCompleted = () => {
-                    taskSource.SetResult(null);
+        public async Task ConvertAsync(Java.IO.File inputFile, Java.IO.File outputFile, Action<double> progress = null) {
+            try
+            {
+                TaskCompletionSource<object> taskSource = new TaskCompletionSource<object>();
+
+                MediaTranscoder.Instance.TranscodeVideo(inputFile.AbsolutePath, outputFile.AbsolutePath, strategy, new TranscoderListener
+                {
+                    TranscodeProgress = progress,
+                    TranscodeFailed = e =>
+                    {
+                        taskSource.TrySetException(e);
+                    },
+                    TranscodeCanceled = () =>
+                    {
+                        taskSource.TrySetCanceled();
+                    },
+                    TranscodeCompleted = () =>
+                    {
+                        taskSource.SetResult(null);
+                    }
+                });
+                await taskSource.Task;
+            }
+            catch (Java.Lang.Exception ex) {
+                if (ex.Message == "MediaFormatStrategy returned pass-through for both video and audio. No transcoding is necessary.") {
+                    await Task.Run(()=> {
+                        System.IO.File.Copy(inputFile.AbsolutePath, outputFile.AbsolutePath);
+                    });
                 }
-            });
-            return taskSource.Task;
+            }
         }
 
     }

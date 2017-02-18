@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Xamarin.Android.MP4Transcoder</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>Video conversion using native MediaEncoder</title>
     <authors>akash.kava</authors>
     <owners></owners>
