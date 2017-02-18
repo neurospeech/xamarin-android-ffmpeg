@@ -18,6 +18,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.MP4Transcoder", "Xamarin.MP4Transcoder\Xamarin.MP4Transcoder.csproj", "{EE8D8C15-947E-4227-BABB-35A4A4A1789A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.MP4Transcoder.Nuget", "MP4Transcoder.Nuget\Xamarin.MP4Transcoder.Nuget\Xamarin.MP4Transcoder.Nuget.csproj", "{9DF8D7C3-9C0E-4014-B44A-A723F4C56ADE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EE8D8C15-947E-4227-BABB-35A4A4A1789A} = {EE8D8C15-947E-4227-BABB-35A4A4A1789A}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +41,10 @@ Global
 		{EE8D8C15-947E-4227-BABB-35A4A4A1789A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE8D8C15-947E-4227-BABB-35A4A4A1789A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE8D8C15-947E-4227-BABB-35A4A4A1789A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DF8D7C3-9C0E-4014-B44A-A723F4C56ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DF8D7C3-9C0E-4014-B44A-A723F4C56ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DF8D7C3-9C0E-4014-B44A-A723F4C56ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DF8D7C3-9C0E-4014-B44A-A723F4C56ADE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

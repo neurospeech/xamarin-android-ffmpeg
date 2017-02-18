@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Xamarin.Android.MP4Transcoder</id>
+    <version>1.0.1</version>
+    <title>Video conversion using native MediaEncoder</title>
+    <authors>akash.kava</authors>
+    <owners></owners>
+    <description>
+      Video conversion using native MediaEncoder
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <summary>
+      Video conversion using native MediaEncoder
+    </summary>
+    <language>en-US</language>
+    <projectUrl>https://github.com/neurospeech/xamarin-android-ffmpeg</projectUrl>
+    <iconUrl>https://nuget.org/Content/Images/packageDefaultIcon-50x50.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
+    <copyright>Copyright  2016</copyright>
+    <dependencies>
+    </dependencies>
+    <references></references>
+    <tags>xamarin,ffmpeg,android</tags>
+  </metadata>
+  <files>
+    <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.dll" target="lib" />
+    <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.pdb" target="lib" />
+    <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.mdb" target="lib" />
+  </files>
+</package>
