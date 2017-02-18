@@ -23,7 +23,7 @@
     <dependencies>
     </dependencies>
     <references></references>
-    <tags>xamarin,ffmpeg,android</tags>
+    <tags>xamarin,mp4,encoder,video,converter,android</tags>
   </metadata>
   <files>
     <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.dll" target="lib" />
