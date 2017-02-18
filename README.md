@@ -1,6 +1,21 @@
 # xamarin-android-ffmpeg
 Xamarin Android FFMpeg binding
 
+# For Android 6.0 onwards, use Xamarin.Android.MP4Transcoder
+
+        Install-Package Xamarin.Android.MP4Transcoder
+
+
+             if (Android.OS.Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat) {
+
+                await Xamarin.MP4Transcoder.Transcoder.For720pFormat().ConvertAsync(inputFile, ouputFile, f => {
+                    onProgress?.Invoke((int)(f * (double)100), 100);
+                });
+                return ouputFile;
+
+            }
+
+
 # Big Thanks
 https://github.com/WritingMinds/ffmpeg-android-java
 
