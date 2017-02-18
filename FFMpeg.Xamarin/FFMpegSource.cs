@@ -24,16 +24,16 @@ namespace FFMpeg.Xamarin
         }
 
         public static FFMpegSource[] Sources = new FFMpegSource[] {
-            new FFMpegSource("arm", x=> !x.EndsWith("86"), "4nzzxDKxIYlvyK8tFH7/iNMHTdU="),
-            new FFMpegSource("x86", x=> x.EndsWith("86"), "DdTbrTBf8Zeh6p5hWL0ggdIp5w4=")
+            new FFMpegSource("arm", x=> !x.EndsWith("86"), "yRVoeaZATQdZIR/lZxMsIa/io9U="),
+            new FFMpegSource("x86", x=> x.EndsWith("86"), "mU4QKhrLEO0aROb9N7JOCJ/rVTA==")
         };
 
         public string Arch { get; }
 
         public string Hash { get; }
         
-        //https://cdn.rawgit.com/neurospeech/xamarin-android-ffmpeg/master/binary/3.0.1/arm/ffmpeg
-        //https://raw.githubusercontent.com/neurospeech/xamarin-android-ffmpeg/master/binary/3.0.1/arm/ffmpeg
+        //https://cdn.rawgit.com/neurospeech/xamarin-android-ffmpeg/master/binary/3.0.1.1/arm/ffmpeg
+        //https://raw.githubusercontent.com/neurospeech/xamarin-android-ffmpeg/master/binary/3.0.1.1/arm/ffmpeg
         public string Url => $"https://{FFMpegLibrary.Instance.CDNHost}/neurospeech/xamarin-android-ffmpeg/v1.0.7/binary/{FFMPEGVersion}/{Arch}/ffmpeg";
 
         public Func<string, bool> IsArch { get; }
