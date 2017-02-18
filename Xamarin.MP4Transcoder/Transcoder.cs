@@ -115,9 +115,9 @@ namespace Xamarin.MP4Transcoder
                         if (System.IO.File.Exists(outputFile.AbsolutePath)) {
                             System.IO.File.Delete(outputFile.AbsolutePath);
                         }
-                        progress(0.3);
+                        progress?.Invoke(0.3);
                         System.IO.File.Copy(inputFile.AbsolutePath, outputFile.AbsolutePath);
-                        progress(1);
+                        progress?.Invoke(1);
                     });
                 }
             }
