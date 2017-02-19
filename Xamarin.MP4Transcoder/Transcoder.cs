@@ -111,7 +111,11 @@ namespace Xamarin.MP4Transcoder
             }
             catch (Java.Lang.Exception ex) {
                 System.Diagnostics.Debug.Fail(ex.Message, ex.ToString());
-                if (ex.Message == "MediaFormatStrategy returned pass-through for both video and audio. No transcoding is necessary.") {
+                if (ex.Message == "MediaFormatStrategy returned pass-through for both video and audio. No transcoding is necessary."
+                    ||
+                    ex.Message.Contains("extractor does not contain video and/or audio tracks")
+                    ) {
+
                     await Task.Run(()=> {
                         if (System.IO.File.Exists(outputFile.AbsolutePath)) {
                             System.IO.File.Delete(outputFile.AbsolutePath);
