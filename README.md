@@ -2,6 +2,7 @@
 Xamarin Android FFMpeg binding
 
 # For Android 6.0 onwards, use Xamarin.Android.MP4Transcoder
+Android 6.0 onwards, `text relocations` are strictly prohibited, many source files used in `ffmpeg` use `text relocations` so `ffmpeg` will never run on future android builds unless they rewrite large library and replace them with alternative of `text relocations`. For this, only alternative is to use Android's native Mp4 transcoder.
 
         Install-Package Xamarin.Android.MP4Transcoder
 
