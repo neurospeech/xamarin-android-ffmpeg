@@ -114,6 +114,8 @@ namespace Xamarin.MP4Transcoder
                 if (ex.Message == "MediaFormatStrategy returned pass-through for both video and audio. No transcoding is necessary."
                     ||
                     ex.Message.Contains("extractor does not contain video and/or audio tracks")
+                    ||
+                    ex.Message.Contains("This video is not 16:9")
                     ) {
 
                     await Task.Run(()=> {
