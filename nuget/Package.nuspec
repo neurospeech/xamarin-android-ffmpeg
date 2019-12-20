@@ -26,8 +26,8 @@
     <tags>xamarin,ffmpeg,android</tags>
   </metadata>
   <files>
-    <file src="..\FFMpeg.Xamarin\bin\debug\*.dll" target="lib" />
-    <file src="..\FFMpeg.Xamarin\bin\debug\*.pdb" target="lib" />
-    <file src="..\FFMpeg.Xamarin\bin\debug\*.mdb" target="lib" />
+    <file src="..\FFMpeg.Xamarin\bin\debug\*.dll" target="lib\MonoAndroid10" />
+    <file src="..\FFMpeg.Xamarin\bin\debug\*.pdb" target="lib\MonoAndroid10" />
+    <file src="..\FFMpeg.Xamarin\bin\debug\*.mdb" target="lib\MonoAndroid10" />
   </files>
 </package>
