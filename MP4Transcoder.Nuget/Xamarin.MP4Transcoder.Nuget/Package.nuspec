@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Xamarin.Android.MP4Transcoder</id>
-    <version>1.0.9</version>
+    <version>$version</version>
     <title>Video conversion using native MediaEncoder</title>
     <authors>akash.kava</authors>
     <owners></owners>
@@ -26,8 +26,8 @@
     <tags>xamarin,mp4,encoder,video,converter,android</tags>
   </metadata>
   <files>
-    <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.dll" target="lib" />
-    <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.pdb" target="lib" />
-    <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.mdb" target="lib" />
+    <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.dll" target="lib\MonoAndroid10" />
+    <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.pdb" target="lib\MonoAndroid10" />
+    <file src="..\..\Xamarin.MP4Transcoder\bin\debug\*.mdb" target="lib\MonoAndroid10" />
   </files>
 </package>
