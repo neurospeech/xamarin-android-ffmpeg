@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.FFmpeg.Nuget", "nuget\Xamarin.FFmpeg.Nuget.csproj", "{0451BAEF-DF2E-4B98-8644-94EE9415E389}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1049745B-3D4C-4DFF-AD8B-DC46F460B5D4} = {1049745B-3D4C-4DFF-AD8B-DC46F460B5D4}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFMpeg.Xamarin", "FFMpeg.Xamarin\FFMpeg.Xamarin.csproj", "{1049745B-3D4C-4DFF-AD8B-DC46F460B5D4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A2C28ED0-0741-4CDE-B9FA-604C145DE4D9}"
